@@ -1,0 +1,41 @@
+"select distinct
+to_char(dtd.tran_date, 'yyyy-mm-dd hh:mm:ss') tran_date,
+trim(dtd.TRAN_ID )as Trans_id,
+
+(trim(dtd.TRAN_ID )||'-'||ltrim(dtd.PART_TRAN_SRL_NUM)) as trans_sub_id,
+(trim(dtd.TRAN_ID )||(dtd.dth_init_sol_id)||to_char(dtd.tran_date,  'yyyymmddhhmmss')||'-'||ltrim(dtd.PART_TRAN_SRL_NUM))trans_ref,
+(dtd.dth_init_sol_id)  BRANCH_CODE,
+(gam.FORACID )ACCOUNT_ID,
+to_char(dtd.TRAN_PARTICULAR ) NARRATIVE,
+to_char(dtd.TRAN_TYPE) as Trans_Mode,
+
+
+to_char(gam.acct_mgr_user_id)account_mgr,
+to_char(dtd.value_date, 'yyyy-mm-dd hh:mm:ss') value_date,
+to_char(dtd.pstd_date,'yyyy-mm-dd hh:mm:ss') pstd_date,
+to_char(dtd.entry_date,'yyyy-mm-dd hh:mm:ss')entry_date,
+dtd.entry_user_id AS    IC4_INPUTTER,
+to_char(dtd.PSTD_USER_ID ) IC4_AUTHORISER,
+to_char(dtd.instrMNT_num)   CHEQUE_NO,
+to_char(dtd.TRAN_CRNCY_CODE)  CRNCY_CODE,
+dtd.rate TRAN_RATE,
+to_char(dtd.tran_sub_type) as SUB_TYPE,
+dtd.ref_amt REF_AMT,
+to_char(dtd.part_tran_type) as Trans_code,
+(gam.acct_name) as cust_name,
+DECODE(dtd.part_tran_type, 'D', (-(dtd.tran_amt)), dtd.tran_amt) as amount
+from
+tbaadm.gam gam,
+tbaadm.dtd dtd 
+
+where  gam.acid = dtd.acid
+and dtd.pstd_flg = 'Y'
+and dtd.del_flg = 'N'
+and dtd.pstd_USER_ID not in ('CDCI', 'SYSTEM')
+and dtd.tran_particular not like 'Normal Interest%'
+and dtd.tran_particular not like '%SMS Alert Charges%'
+and dtd.tran_particular not like '%SMS ALERT CHARGE%'
+
+--and dtd.entry_user_id not in ('WC090','S07564','WC443','S07517','S06009','S05210','S05058','S05387','S04671')
+
+"

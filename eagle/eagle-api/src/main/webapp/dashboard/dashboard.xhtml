@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/templates/template.xhtml">
+	<ui:define name="content">
+		<h:form>
+			<p:poll interval="#{dashboard.refreshInterval}"
+				listener="#{dashboard.updateDashboard}" update="dashboardId" />
+			<section id="fh5co-projects">
+				<div class="container">
+					<p:outputPanel id="dashboardId">
+						<H2>Remita Status as at #{dashboard.currentTime}</H2>
+						<p:commandButton actionListener="#{dashboard.toggleDashboard}" value="Toggle View" update="dashboardId" />
+						<p:outputPanel id="summaryByCode" rendered="#{!dashboard.summaryByRequest}">
+							<div class="row">
+								<div class="col-md-2"></div>
+								<div class="col-md-8">
+									<p:dataTable id="returnCodes" var="item" value="#{dashboard.summaryList}"
+									 	paginator="true"
+										paginatorTemplate="{Exporters}">
+									 <f:facet name="{Exporters}">
+								            <h:commandLink>
+								                <img src="#{request.contextPath}/resources/images/excel.png" alt="" width="24" />
+								                <p:dataExporter type="xls" target="returnCodes" fileName="response" />
+								            </h:commandLink>
+								 
+								            <h:commandLink>
+								            	<img src="#{request.contextPath}/resources/images/pdf.png" alt="" width="24" />
+								                <p:dataExporter type="pdf" target="returnCodes" fileName="response"/>
+								            </h:commandLink>
+								 
+								            <h:commandLink>
+								                <img src="#{request.contextPath}/resources/images/csv.png" alt="" width="24" />
+								                <p:dataExporter type="csv" target="returnCodes" fileName="response" />
+								            </h:commandLink>
+								 
+								        </f:facet>
+									    <p:column headerText="Code">
+									        <h:outputText value="#{item.code}" />
+									    </p:column>
+									 
+									    <p:column headerText="Description">
+									        <h:outputText value="#{item.description}" />
+									    </p:column>
+									 
+									    <p:column headerText="Total">
+									        <h:outputText value="#{item.total}" />
+									    </p:column>
+									</p:dataTable>
+								</div>
+								<div class="col-md-2"></div>
+							</div>
+						</p:outputPanel>
+						<p:outputPanel id="summaryByRequest" rendered="#{dashboard.summaryByRequest}">
+							<div class="row">
+							<div class="col-md-3 col-sm-6 col-xxs-12 animate-box">
+								<p:commandLink actionListener="#{dashboard.goToDetail}"
+									class="fh5co-project-item image-popup">
+									<f:param name="action" value="account-inquiry" />
+									<div class="fh5co-text">
+										<h2>BALANCE INQUIRY</h2>
+										<p>Balance inquiry request</p>
+										<table class="table table-responsive">
+											<tbody>
+
+												<tr>
+													<td><i class="fa fa-clock-o fa-2x"></i></td>
+													<td>Total Requests</td>
+													<td>#{dashboard.balance.total}</td>
+												</tr>
+												<tr>
+													<td><i class="fa fa-book fa-2x"></i></td>
+													<td>Total Success</td>
+													<td>#{dashboard.balance.totalSuccess}</td>
+												</tr>
+												<tr>
+													<td><i class="fa fa-twitch fa-2x"></i></td>
+													<td>Total Failures</td>
+													<td>#{dashboard.balance.totalFailure}</td>
+												</tr>
+
+											</tbody>
+										</table>
+									</div>
+								</p:commandLink>
+							</div>
+
+							<div class="col-md-3 col-sm-6 col-xxs-12 animate-box">
+								<p:commandLink actionListener="#{dashboard.goToDetail}"
+									class="fh5co-project-item image-popup">
+									<f:param name="action" value="funds-transfer" />
+									<div class="fh5co-text">
+										<h2>FUNDS TRANSFER</h2>
+										<p>Funds Transfer request</p>
+										<table class="table table-responsive">
+											<tbody>
+
+												<tr>
+													<td><i class="fa fa-clock-o fa-2x"></i></td>
+													<td>Total Requests</td>
+													<td>#{dashboard.ft.total}</td>
+												</tr>
+												<tr>
+													<td><i class="fa fa-book fa-2x"></i></td>
+													<td>Total Success</td>
+													<td>#{dashboard.ft.totalSuccess}</td>
+												</tr>
+												<tr>
+													<td><i class="fa fa-twitch fa-2x"></i></td>
+													<td>Total Failures</td>
+													<td>#{dashboard.ft.totalFailure}</td>
+												</tr>
+
+											</tbody>
+										</table>
+									</div>
+								</p:commandLink>
+							</div>
+
+							<div class="col-md-3 col-sm-6 col-xxs-12 animate-box">
+								<p:commandLink actionListener="#{dashboard.goToDetail}"
+									class="fh5co-project-item image-popup">
+									<f:param name="action" value="transfer-status" />
+									<div class="fh5co-text">
+										<h2>TRANSFER STATUS</h2>
+										<p>Transfer Status Request</p>
+										<table class="table table-responsive">
+											<tbody>
+
+												<tr>
+													<td><i class="fa fa-clock-o fa-2x"></i></td>
+													<td>Total Requests</td>
+													<td>#{dashboard.status.total}</td>
+												</tr>
+												<tr>
+													<td><i class="fa fa-book fa-2x"></i></td>
+													<td>Total Success</td>
+													<td>#{dashboard.status.totalSuccess}</td>
+												</tr>
+												<tr>
+													<td><i class="fa fa-twitch fa-2x"></i></td>
+													<td>Total Failures</td>
+													<td>#{dashboard.status.totalFailure}</td>
+												</tr>
+
+											</tbody>
+										</table>
+									</div>
+								</p:commandLink>
+							</div>
+
+							<div class="col-md-3 col-sm-6 col-xxs-12 animate-box">
+								<p:commandLink actionListener="#{dashboard.goToDetail}"
+									class="fh5co-project-item image-popup">
+									<f:param name="action" value="account-statement" />
+									<div class="fh5co-text">
+										<h2>ACCOUNT STATEMENT</h2>
+										<p>Account Statement request</p>
+										<table class="table table-responsive">
+											<tbody>
+
+												<tr>
+													<td><i class="fa fa-clock-o fa-2x"></i></td>
+													<td>Total Requests</td>
+													<td>#{dashboard.statement.total}</td>
+												</tr>
+												<tr>
+													<td><i class="fa fa-book fa-2x"></i></td>
+													<td>Total Success</td>
+													<td>#{dashboard.statement.totalSuccess}</td>
+												</tr>
+												<tr>
+													<td><i class="fa fa-twitch fa-2x"></i></td>
+													<td>Total Failures</td>
+													<td>#{dashboard.statement.totalFailure}</td>
+												</tr>
+
+											</tbody>
+										</table>
+									</div>
+								</p:commandLink>
+							</div>
+						</div>
+						</p:outputPanel>
+
+						
+					</p:outputPanel>
+				</div>
+			</section>
+		</h:form>
+	</ui:define>
+</ui:composition>

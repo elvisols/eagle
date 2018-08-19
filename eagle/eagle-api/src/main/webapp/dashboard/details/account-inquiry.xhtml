@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+	<h:form>
+		
+		<div id="fh5co-pages">
+			<div class="container content">
+				<div class="row">
+					<div class="col-md-12"><h1>Account Inquiry Summary</h1></div>
+				</div>
+				<div class="row">
+					<div class="col-md-6">
+						<div class="panel panel-warning">
+							<div class="panel-heading">
+								<h2 class="panel-title">Summary as at #{dashboard.refreshTime} </h2>
+							</div>
+							<div class="panel-body">
+								<table class="table" style="font-size:12px;">
+
+									<tr>
+										<th scope="row">Total Requests</th>
+										<td>#{dashboard.balance.total}</td>
+									</tr>
+									<tr>
+										<th scope="row">Total Success</th>
+										<td>#{dashboard.balance.totalSuccess}</td>
+									</tr>
+									<tr>
+										<th scope="row">Total Failure</th>
+										<td>#{dashboard.balance.totalFailure}</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6"></div>
+				</div>
+				<h1></h1>
+				<div class="row">
+					<div class="col-md-12">
+					    <p:dataTable id="detailResult" var="bal" value="#{account.balances}" rows="10" widgetVar="balTable"
+					    					 emptyMessage="No reguest found with given criteria" filteredValue="#{account.filteredBalances}"
+					                         paginator="true"
+					                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {Exporters}"
+					                         rowsPerPageTemplate="5,10,15">
+					         
+					         <f:facet name="{Exporters}">
+					            <h:commandLink>
+					                <img src="#{request.contextPath}/resources/images/excel.png" alt="" width="24" />
+					                <p:dataExporter type="xls" target="detailResult" fileName="account" />
+					            </h:commandLink>
+					 
+					            <h:commandLink>
+					            	<img src="#{request.contextPath}/resources/images/pdf.png" alt="" width="24" />
+					                <p:dataExporter type="pdf" target="detailResult" fileName="account"/>
+					            </h:commandLink>
+					 
+					            <h:commandLink>
+					                <img src="#{request.contextPath}/resources/images/csv.png" alt="" width="24" />
+					                <p:dataExporter type="csv" target="detailResult" fileName="account" />
+					            </h:commandLink>
+					 
+					        </f:facet>
+ 
+					        <p:column headerText="Account" filterBy="#{bal.accountNumber}" filterMatchMode="contains">
+					            <h:outputText value="#{bal.accountNumber}" />
+					        </p:column>
+					 
+					        <p:column headerText="Code" filterBy="#{bal.response.code}" filterMatchMode="contains">
+					            <h:outputText value="#{bal.response.code}" />
+					        </p:column>
+					 
+					        <p:column headerText="Description">
+					            <h:outputText value="#{bal.response.description}" />
+					        </p:column>
+					 
+					        <p:column headerText="Resp Date">
+					            <h:outputText value="#{bal.responseDate}">
+					            	<f:convertDateTime pattern="dd-MM-yyyy" timeZone="GMT+1"/>
+					            </h:outputText>
+					        </p:column>
+					        
+					        <p:column headerText="Resp Time">
+					            <h:outputText value="#{bal.responseTime}">
+					            	<f:convertDateTime pattern="HH:mm" timeZone="GMT+1"/>
+					            </h:outputText>
+					        </p:column>
+					    </p:dataTable>
+					</div>
+				</div>
+				
+			</div>
+
+		</div>
+		
+	</h:form>
+</ui:composition>

@@ -1,0 +1,164 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+	<h:form id="form">
+		
+		<div id="fh5co-pages">
+			<div class="container content">
+				<div class="row">
+					<div class="col-md-12"><h1>Funds Transfer</h1></div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<p:panel id="queryParameter" header="Query Parameters"  style="margin-bottom:20px" rendered="#{dashboard.fromQuery}">
+					        <h:panelGrid columns="2" cellpadding="0">
+					            <h:outputText value="Trans Ref:" />
+				                <h:outputText value="#{report.transRef}" />
+				                
+				                <h:outputText value="Start Date:" />
+				                <h:outputText value="#{report.startDate}">
+				                	<f:convertDateTime pattern="dd-MM-yyyy" timeZone="GMT+1"/>
+				                </h:outputText>
+				                
+				                <h:outputText value="End Date:" />
+				                <h:outputText value="#{report.endDate}">
+				                	<f:convertDateTime pattern="dd-MM-yyyy" timeZone="GMT+1"/>
+				                </h:outputText>
+				                
+					        </h:panelGrid>
+					    </p:panel>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<p:panel id="dashboardSummary" header="Dashboard Summary"  style="margin-bottom:20px" rendered="#{!dashboard.fromQuery}">
+					        <h:panelGrid columns="2" cellpadding="0">
+					            <h:outputText value="Total Requests:" />
+				                <h:outputText value="#{dashboard.ft.total}" />
+				                
+				                <h:outputText value="Total Success:" />
+				                <h:outputText value="#{dashboard.ft.totalSuccess}">
+				                </h:outputText>
+				                
+				                <h:outputText value="Total Failure:" />
+				                <h:outputText value="#{dashboard.ft.totalFailure}">
+				                </h:outputText>
+				                
+					        </h:panelGrid>
+					    </p:panel>
+					</div>
+				</div>
+				
+				<h1></h1>
+				<div class="row">
+					<div class="col-md-12">
+					    <p:dataTable id="detailResult" selectionMode="single" var="bal" value="#{transfer.transfers}" rows="10" widgetVar="balTable"
+					    					 emptyMessage="No reguest found with given criteria" filteredValue="#{transfer.filteredTransfers}"
+					                         paginator="true"
+					                         rowKey="#{bal.transRef}"
+					                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {Exporters}"
+					                         rowsPerPageTemplate="5,10,15">
+					         <p:ajax event="rowSelect" listener="#{transfer.onRowSelect}" update=":form:transferDetail" oncomplete="PF('transferDialog').show()" />
+					         <p:ajax event="rowUnselect" listener="#{transfer.onRowUnselect}" update=":form:transferDetail" />
+					         <f:facet name="{Exporters}">
+					            <h:commandLink>
+					                <img src="#{request.contextPath}/resources/images/excel.png" alt="" width="24" />
+					                <p:dataExporter type="xls" target="detailResult" fileName="transfer" />
+					            </h:commandLink>
+					 
+					            <h:commandLink>
+					            	<img src="#{request.contextPath}/resources/images/pdf.png" alt="" width="24" />
+					                <p:dataExporter type="pdf" target="detailResult" fileName="transfer"/>
+					            </h:commandLink>
+					 
+					            <h:commandLink>
+					                <img src="#{request.contextPath}/resources/images/csv.png" alt="" width="24" />
+					                <p:dataExporter type="csv" target="detailResult" fileName="transfer" />
+					            </h:commandLink>
+					 
+					        </f:facet>
+ 
+ 							<p:column headerText="Trans Ref" filterBy="#{bal.transRef}" filterMatchMode="contains">
+					            <h:outputText value="#{bal.transRef}" />
+					        </p:column>
+					        
+					        <p:column headerText="Dr Account" filterBy="#{bal.drAccount}" filterMatchMode="contains">
+					            <h:outputText value="#{bal.drAccount}" />
+					        </p:column>
+					 
+					 		<p:column headerText="Cr Account" filterBy="#{bal.crAccount}" filterMatchMode="contains">
+					            <h:outputText value="#{bal.crAccount}" />
+					        </p:column>
+					        
+					        <p:column headerText="Tran Date">
+					            <h:outputText value="#{bal.tranDate}">
+					            	<f:convertDateTime pattern="dd-MM-yyyy HH:mm" timeZone="GMT+1"/>
+					            </h:outputText>
+					        </p:column>
+					        
+					        <p:column headerText="Tran Amount">
+					            <h:outputText value="#{bal.amount}">
+					            	<f:convertNumber pattern="#,###.00"/>
+					            </h:outputText>
+					        </p:column>
+					        
+					        <p:column headerText="Code" filterBy="#{bal.response.code}" filterMatchMode="contains">
+					            <h:outputText value="#{bal.response.code}" />
+					        </p:column>
+					 
+					        <p:column headerText="Description">
+					            <h:outputText value="#{bal.response.description}" />
+					        </p:column>
+					 
+					        <p:column headerText="Resp Date">
+					            <h:outputText value="#{bal.responseDate}">
+					            	<f:convertDateTime pattern="dd-MM-yyyy" timeZone="GMT+1"/>
+					            </h:outputText>
+					        </p:column>
+					        
+					        <p:column headerText="Resp Time">
+					            <h:outputText value="#{bal.responseTime}">
+					            	<f:convertDateTime pattern="HH:mm" timeZone="GMT+1"/>
+					            </h:outputText>
+					        </p:column>
+					    </p:dataTable>
+					</div>
+				</div>
+				
+			</div>
+
+		</div>
+		
+		<p:dialog header="Transfer Info" widgetVar="transferDialog" modal="true" showEffect="fade" hideEffect="fade" 
+			closable="true" closeOnEscape="true">
+	        <p:outputPanel id="transferDetail" style="text-align:center;">
+	            <p:panelGrid  columns="2" rendered="#{not empty transfer.cbaTransfer}">
+	                
+	                <h:outputText value="Dr Account:" />
+	                <h:outputText value="#{transfer.cbaTransfer.drAccount.iban}" />
+	                
+	                <h:outputText value="Cr Account:" />
+	                <h:outputText value="#{transfer.cbaTransfer.crAccount.iban}" />
+	 		
+	 				<h:outputText value="Ref Id:" />
+	                <h:outputText value="#{transfer.cbaTransfer.cbaReqId}" />
+	                
+	                <h:outputText value="Seq Number:" />
+	                <h:outputText value="#{transfer.cbaTransfer.sequenceNumber}">
+	                	<f:convertNumber pattern="#,###"/>
+	                </h:outputText>
+	                
+	                <h:outputText value="Amount:" />
+	                <h:outputText value="#{transfer.cbaTransfer.amount}">
+	                	<f:convertNumber pattern="#,###.00"/>
+	                </h:outputText>
+	                
+	            </p:panelGrid>
+	        </p:outputPanel>
+	    </p:dialog>
+	</h:form>
+</ui:composition>

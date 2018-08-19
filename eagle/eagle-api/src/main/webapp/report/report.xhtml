@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/templates/template.xhtml">
+	<ui:define name="content">
+		<h:form>
+			<section id="fh5co-projects fh5co-sub-lead">
+				<div class="container">
+					<H2>Remita Query</H2>
+					<div class="row">
+						<div class="col-md-12">
+							<div class="panel panel-warning">
+								<div class="panel-heading">
+									<h2 class="panel-title">Search Queries</h2>
+								</div>
+								<div class="panel-body">
+									<div class="row">
+										<div class="col-md-3">
+											<H4>Trans Ref</H4>
+										</div>
+										<div class="col-md-5 animate-box2">
+											<p:inputText value="#{report.transRef}" styleClass="animate-box2"></p:inputText>  
+										</div>
+										<div class="col-md-4"></div>
+									</div>
+									<div class="row">
+										<div class="col-md-3 animate-box">
+											<H4>Start Date</H4>
+										</div>
+										<div class="col-md-5 animate-box">
+											<p:calendar styleClass="animate-box2" value="#{report.startDate}" pattern="dd-MM-yyyy" mode="popup" showOn="button" />
+										</div>
+										<div class="col-md-4"></div>
+									</div>
+									<div class="row">
+										<div class="col-md-3 animate-box">
+											<H4>End Date</H4>
+										</div>
+										<div class="col-md-5 animate-box2">
+											<p:calendar styleClass="animate-box2" value="#{report.endDate}" pattern="dd-MM-yyyy"  mode="popup" showOn="button" />
+										</div>
+										<div class="col-md-4"></div>
+									</div>
+									<div class="row">
+										<div class="col-md-3"></div>
+										<div class="col-md-5 animate-box2">
+											<p:commandButton value="Search" action="#{report.runQuery}">
+												<f:param name="action" value="report" />
+											</p:commandButton>
+										</div>
+										<div class="col-md-4"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+				</div>
+			</section>
+		</h:form>
+	</ui:define>
+</ui:composition>

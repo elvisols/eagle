@@ -1,0 +1,15 @@
+@font-face {
+    font-family: 'Altair';
+    src: url('fonts/Altair-Thin-Trial.eot');
+    src: url('fonts/Altair-Thin-Trial.eot') format('embedded-opentype'),
+        url('fonts/Altair-Thin-Trial.woff') format('woff'),
+        url('fonts/Altair-Thin-Trial.ttf') format('truetype');
+}
+
+.badge-danger {
+    background-color: #dc3545 !important;
+}
+
+thead th {
+    font-weight: 500 !important;
+}

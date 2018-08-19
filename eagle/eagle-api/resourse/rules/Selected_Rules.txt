@@ -1,0 +1,183 @@
+---EASY LIFE ACCOUNT THAT EXCEEDS N300k-b
+SELECT 
+a.cust_id,
+a.clr_bal_amt,
+to_char(a.clr_bal_amt,'99,999,999,999,999.00')bal_Amount,
+a.foracid,
+trunc(a.acct_opn_date) acct_opn_date_1,
+a.acct_opn_date,
+a.acct_name,
+trunc(a.lchg_time) lchg_time_1,
+a.lchg_time,
+a.sol_id,
+(select sol_desc from tbaadm.sol where sol_id=a.sol_id) Branch_name,
+a.ACCT_MGR_USER_ID,
+a.lchg_user_id,
+a.last_any_tran_date,
+from tbaadm.gam a
+where a.gl_sub_head_code in  ('31146','75936','31161','31148','31151','31117')
+and a.del_flg = 'N'
+and a.entity_cre_flg = 'Y'
+and a.acct_cls_flg = 'N'
+and a.clr_bal_amt > 300000
+
+---SINGLE INFLOW INTO EASY LIFE ACCOUNT ABOVE 50K-
+select  a.foracid,
+a.sol_id,
+a.acct_name,to_char(b.tran_date, 'DD-MON-YYY') tran_date,
+b.entry_Date,b.tran_id,b.tran_amt,
+a.clr_bal_amt,
+a.schm_code,
+(select schm_desc from tbaadm.gsp where schm_code = a.schm_code)schm_name,
+b.tran_particular narration,
+b.entry_user_id,b.pstd_user_id, a.frez_code
+from tbaadm.gam a,
+tbaadm.dtd b
+where a.acid = b.acid
+and b.part_tran_type = 'C'
+and a.gl_sub_head_code in ('31146','75936','31161','31148','31151','31117')
+and b.pstd_flg = 'Y'
+and b.tran_amt > 50000
+and b.tran_particular not like '%Ac xfr from%'
+order by a.frez_code asc
+
+---SUSPICIOUS INFLOW:
+select g.acid, 
+g.foracid, 
+g.acct_name, h.tran_type, 
+h.part_tran_type, 
+h.entry_user_id,
+h.tran_amt,
+h.pstd_user_id,
+g.acct_mgr_user_id,  
+g.clr_bal_amt, g.acct_opn_Date, 
+g.last_tran_date,
+h.entry_date,
+dd.ave_amt,
+h.dth_INIT_SOL_ID,
+h.tran_id,
+h.tran_particular
+from tbaadm.gam  g, 
+tbaadm.dtd h,
+( select acid, avg(tran_amt)ave_amt
+from tbaadm.htd
+where part_tran_type = 'C'
+and tran_date >= (sysdate-90)
+group by acid
+)dd
+where g.acid = h.acid
+and h.acid = dd.acid
+and h.tran_amt >= dd.ave_amt
+
+
+---FRAUD ALERT: Repeated Airtime Purchase Above 5K
+
+select 
+g.acid, g.foracid,
+trunc(h.tran_date)entry_date,
+g.acct_ownership,
+Count(Distinct H.Tran_Id)No_Txns,
+sum(h.tran_amt)total_amt,
+G.Acct_Name
+From TBAADM.GAM G, 
+TBAADM.DTD h
+where g.acid = h.acid
+and ( h.tran_particular like ('%AIRTIME%') or h.tran_particular  like ('Airtime via USSD%')
+or (h.tran_particular  like 'ATM Recharge on%')   or (h.tran_particular  like '%MOBILE AIRTIME%')
+)
+And H.Part_Tran_Type = 'D'
+And G.Acct_Ownership = 'C'
+And H.Tran_Particular Not Like '%REV%'
+And Trunc(H.Tran_Date) = Trunc(Sysdate)
+Group By G.Acid, G.Foracid, Trunc(H.Tran_Date), G.Acct_Ownership, G.Acct_Name
+having count(distinct h.tran_id) > 1 and sum(h.tran_amt) > 10000
+
+
+--FRAUD_Desk: Repeated Debits into Customers Account
+Select 
+H.Tran_Date, G.Acid,
+g.foracid, g.acct_ownership,
+count(distinct h.tran_id)no_txns,
+g.acct_name,
+sum(h.tran_amt)sum_amt
+from tbaadm.gam g, 
+tbaadm.dtd h
+where g.acid = h.acid
+and h.tran_amt >= 50000
+and h.part_tran_type = 'D'
+And G.Acct_Ownership = 'C'
+And substr(g.cif_id, 1,1) = 'R'
+And H.Tran_Sub_Type not in ('NR','NP')
+and h.tran_particular not like '%ATM WD on%'
+and h.tran_particular not like '%A-CASH WITHDRAWAL%'
+and h.tran_particular not like '%ONLINE TRANSFER TO%'
+and h.tran_particular not like '%NAPS Transfer to%'
+and h.tran_particular not like '%FUNDS TRANSFER%'
+and h.tran_particular not like '%T-CHEQUE PAID%'
+and h.tran_particular not like '%CASH WITHDRAWAL PINPAD%'
+and h.tran_particular not like '%FT IFO%'
+and h.tran_particular not like '%A-CHEQUE PAID%'
+and h.tran_particular not like '%BG XFER FRM%'
+and h.tran_particular not like '%TRSFD BY%'
+and h.tran_particular not like '%ATM Trf on%'
+and h.tran_particular not like '%T-CASH WITHDRAWAL%'
+and h.tran_particular not like '%TRF BO%'
+and h.tran_particular not like '%bg xfer frm%'
+and h.tran_particular not like '%TRF IFO%'
+and h.tran_particular not like '%TRSF BO%'
+And H.Tran_Particular Not Like '%NIP TO%'
+and h.tran_particular not like '%NIP IRO%'
+and h.tran_particular not like '%ONLINE TRANSFER%'
+and h.tran_particular not like '%MOBILE TRANSFER%'
+and h.tran_particular not like '%Refitok-%'
+and h.tran_particular not like '%Rev -Airtime via USSD%'
+and h.tran_particular not like '%VAT-MOBILE TRSF%'
+and h.tran_particular not like '%COMM-MOBILE TRSF%'
+and h.tran_particular not like '%REVSL OF ATM%'
+and h.tran_particular not like '%Rev -Airtime via USSD  TO%'
+and h.tran_particular not like '%Fixed Deposit Closure Proceeds%'
+and h.tran_particular not like '%SMS ALERT CHARGE%'
+and h.tran_particular not like '%ATM WD Reversal%'
+and h.tran_particular not like '%Closure proceeds credited to%'
+and h.tran_particular not like '%Consolidated Withholding Tax%'
+and h.tran_particular not like '%Interest on Fixed Deposit%'
+and h.tran_particular not like '%ATM WD RCH Rev %'
+and h.tran_particular not like '%ATM WD RCH Rev%'
+and h.tran_particular not like '%SMS Alert Charges for the Month of %'
+and h.tran_particular not like '%Vat CARD MAINTENANCE FEE MASTERCARD%'
+and h.tran_particular not like '%Vat CARD MAINTENANCE FEE MASTERCARD%'
+and h.tran_particular not like '%CARD MAINTENANCE FEE MASTERCARD%'
+and h.tran_particular not like '%CARD MAINTENANCE FEE VISA DEBIT CARD%'
+and h.tran_particular not like '%Loan  Repayment For%'
+and h.tran_particular not like '%CARD MAINTENANCE FEE VISA%'
+and h.tran_particular not like '%Vat CARD MAINTENANCE FEE VISA%'
+and h.tran_particular not like '%CARD MAINTENANCE FEE VISA%'
+and h.tran_particular not like '%Account Maintenance Fee:%'
+and h.tran_particular not like '%VAT on Account Maintenance Fee%'
+and h.tran_particular not like '%REV VAT ON%'
+and h.tran_particular not like '%Loan Account Payments%'
+and h.tran_particular not like '%STAMP DUTY ON%'
+and h.tran_particular not like '%Loan Recovery From :%'
+and h.tran_particular not like '%ALAT MASTERCARD ISSUANCE FEE%'
+and h.tran_particular not like '%VAT-ONLINE TRSF%'
+and h.tran_particular not like '%COMM-ONLINE TRSF%'
+and h.tran_particular not like '%Quaterly Credit Check Service Charge %'
+and h.tran_particular not like '%Loan  Repayment%'
+and h.tran_particular not like '%CARD MAINTENANCE FEE VERVE,%'
+and h.tran_particular not like '%Vat CARD MAINTENANCE FEE VERVE%'
+and h.tran_particular not like '%VAT ALAT NIP TRANSFER TO%'
+And H.Tran_Particular Not Like '%REVERSAL - MOBILE AIRTIME%'
+And H.Tran_Particular Not Like '%Withdraw|%'
+And H.Tran_Particular Not Like '%Interest|%'
+And H.Tran_Particular Not Like '%INTEREST|%'
+And H.Tran_Particular Not Like '%WITHDRAW%'
+And H.Tran_Particular Not Like '%ALAT POS Buy on%'
+And H.Tran_Particular Not Like '%TOPUP%'
+And H.Tran_Particular Not Like '%SO|%'
+And H.Tran_Particular Not Like '%POS Buy on%'
+and g.schm_code not in ('INCOM','ASSET','LIABL','PROXY','EXPNS','72001','SYSAC','TRADE','WA005','TI001',
+'62002','AL001','ASSTS','CASH','CF008','CF009','CONAS','CONLI','EL008','EXPNE','FT004','FT005','FT006','FT008','HC001','HM003','HS002','HS004','IF010','IS001','LP009','MC001','MF001',
+'MF002','NH001','PN002','TC014','TC015','TI001','TRADE','WA005','60011')
+
+Group By H.Tran_Date, G.Acid, G.Foracid, G.Acct_Ownership, G.Acct_Name
+Having Count(Distinct H.Tran_Id) > 2

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/templates/login-template.xhtml">
+	<ui:define name="content" >
+		<h:form>
+			<p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />
+			<section id="fh5co-projects">
+				<div class="container">
+					<div class="row">
+						<div class="col-md-4">
+						</div>
+						<div class="col-md-4">
+							<h:panelGrid columns="2" rendered="#{!login.loggedIn}">
+								<f:validateBean>
+									<h:outputLabel for="username">Username:</h:outputLabel>
+									<h:inputText id="username" value="#{credentials.username}" />
+									<h:outputLabel for="password">Password:</h:outputLabel>
+									<h:inputSecret id="password" value="#{credentials.password}" />
+								</f:validateBean>
+							</h:panelGrid>
+							<h:commandButton value="Login" action="#{login.login}" 	rendered="#{!login.loggedIn}" />
+							<h:commandButton value="Logout" action="#{login.logout}" rendered="#{login.loggedIn}" />
+								
+						</div>
+						<div class="col-md-4">
+						</div>
+						
+					</div>
+				</div>
+			</section>
+		</h:form>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,10 @@
+Realtime and retrospective fraud screening capabilities for continuous fraud detection
+Ability to combine customized rules with machine learning, predictive and behavioral analytics for fraud detection
+Ability to provide analytical view of transaction trends to aid decision making
+Efficient and effective customer profiling technique
+Very low rate of false positives and elimination of manual reviews
+Realtime capability for blocking of transactions identified to be fraudulent
+Capability for fraud monitoring across all channels and insider related fraud
+Transaction callover with ability to read/view mandate
+Ability to create and generate customized reports
+Flexibility and ease of use.
